@@ -32,6 +32,12 @@
         "*://*.oj.vnoi.info/*",
         "*://*.dmoj.ca/*"
       ],
+      "exclude_matches": [
+        "*://*/*/raw",
+        "*://*/*/raw/*",
+        "*://*/raw",
+        "*://*/raw/*"
+      ],
       "js": [
         "content/mj_shim.js"
       ],
@@ -43,6 +49,12 @@
         "*://*.csoj.edu.vn/*",
         "*://*.oj.vnoi.info/*",
         "*://*.dmoj.ca/*"
+      ],
+      "exclude_matches": [
+        "*://*/*/raw",
+        "*://*/*/raw/*",
+        "*://*/raw",
+        "*://*/raw/*"
       ],
       "css": [
         "content/content.css"

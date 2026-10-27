@@ -6,12 +6,6 @@
 (function () {
   'use strict';
 
-  // Skip raw code view pages
-  if (/\/raw(\/|$)/i.test(location.pathname)) {
-    LOG.warn('Raw code page — skipping toolkit injection.');
-    return;
-  }
-
   const waitForBody = () => new Promise((resolve) => {
     if (document.body) return resolve();
     const obs = new MutationObserver(() => {

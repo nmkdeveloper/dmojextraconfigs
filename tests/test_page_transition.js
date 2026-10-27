@@ -85,6 +85,12 @@ function runTests() {
   };
   assert.strictEqual(PageTransition._isEligibleLink(hashLink), false, 'Hash link should not be eligible');
 
+  const rawLink = {
+    getAttribute(name) { return name === 'href' ? '/src/12345/raw' : null; },
+    hasAttribute() { return false; }
+  };
+  assert.strictEqual(PageTransition._isEligibleLink(rawLink), false, 'Raw link should not be intercepted');
+
   const ctrlClick = { ctrlKey: true };
   assert.strictEqual(PageTransition._isEligibleLink(internalLink, ctrlClick), false, 'Ctrl+click should not trigger transition');
 
