@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NMK Developer DMOJ Configs</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="header">
+    <div class="logo-wrap">
+      <img src="../assets/icons/icon48.png" alt="logo" class="logo">
+      <div>
+        <div class="title">DMOJ Extra Configs</div>
+        <div class="subtitle">by NMK Developer • v7.0.0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="current-site">
+    <div class="site-label">Trang hiện tại:</div>
+    <div class="site-row">
+      <span id="current-hostname" class="site-name">Đang kiểm tra...</span>
+      <span id="site-badge" class="badge">Kiểm tra</span>
+    </div>
+    <button id="toggle-dock-btn" class="btn btn-primary" style="margin-top: 8px; width: 100%;">
+      ✨ Đóng / Mở Floating Dock
+    </button>
+  </div>
+
+  <div class="section-title">Quản lý tên miền DMOJ</div>
+  <div class="domain-manager">
+    <div class="add-domain-row">
+      <input type="text" id="new-domain-input" placeholder="Ví dụ: myoj.edu.vn" />
+      <button id="add-domain-btn" class="btn btn-accent">+ Thêm</button>
+    </div>
+    <ul id="domain-list" class="domain-list"></ul>
+  </div>
+
+  <div class="section-title">Cài đặt tính năng</div>
+  <div class="settings-group">
+    <label class="setting-item">
+      <span>🎉 AC Easter Egg Video</span>
+      <input type="checkbox" id="toggle-easter-egg" checked>
+    </label>
+  </div>
+
+  <div class="footer-actions">
+    <button id="reset-current-btn" class="btn btn-danger" style="width: 100%;">
+      🔄 Đặt lại cài đặt trang này
+    </button>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

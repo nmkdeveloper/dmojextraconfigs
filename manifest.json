@@ -1,0 +1,88 @@
+{
+  "manifest_version": 3,
+  "name": "NMK Developer DMOJ-based Extra Configs",
+  "version": "7.0.1",
+  "description": "Bộ công cụ tối ưu hóa giao diện và hiệu năng nâng cao cho các nền tảng DMOJ (CSOJ, VNOJ, DMOJ.ca).",
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "*://*.csoj.edu.vn/*",
+    "*://*.oj.vnoi.info/*",
+    "*://*.dmoj.ca/*",
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.csoj.edu.vn/*",
+        "*://*.oj.vnoi.info/*",
+        "*://*.dmoj.ca/*"
+      ],
+      "js": [
+        "content/mj_shim.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://*.csoj.edu.vn/*",
+        "*://*.oj.vnoi.info/*",
+        "*://*.dmoj.ca/*"
+      ],
+      "css": [
+        "content/content.css"
+      ],
+      "js": [
+        "libs/marked.min.js",
+        "libs/fflate.min.js",
+        "libs/cytoscape.min.js",
+        "content/storage.js",
+        "content/dock.js",
+        "content/modules/page_transition.js",
+        "content/modules/logo_manager.js",
+        "content/modules/background.js",
+        "content/modules/quote.js",
+        "content/modules/graph.js",
+        "content/modules/pomodoro.js",
+        "content/modules/game2048.js",
+        "content/modules/export_zip.js",
+        "content/modules/ac_easter_egg.js",
+        "content/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "libs/mathjax/*",
+        "assets/*",
+        "content/content.css",
+        "content/mj_shim.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  }
+}
