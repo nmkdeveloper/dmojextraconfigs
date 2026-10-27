@@ -32,12 +32,6 @@
         "*://*.oj.vnoi.info/*",
         "*://*.dmoj.ca/*"
       ],
-      "exclude_matches": [
-        "*://*/*/raw",
-        "*://*/*/raw/*",
-        "*://*/raw",
-        "*://*/raw/*"
-      ],
       "js": [
         "content/mj_shim.js"
       ],
@@ -51,10 +45,30 @@
         "*://*.dmoj.ca/*"
       ],
       "exclude_matches": [
-        "*://*/*/raw",
-        "*://*/*/raw/*",
-        "*://*/raw",
-        "*://*/raw/*"
+        "*://*.csoj.edu.vn/*/raw",
+        "*://*.csoj.edu.vn/*/raw/*",
+        "*://*.csoj.edu.vn/raw",
+        "*://*.csoj.edu.vn/raw/*",
+        "*://csoj.edu.vn/*/raw",
+        "*://csoj.edu.vn/*/raw/*",
+        "*://csoj.edu.vn/raw",
+        "*://csoj.edu.vn/raw/*",
+        "*://*.oj.vnoi.info/*/raw",
+        "*://*.oj.vnoi.info/*/raw/*",
+        "*://*.oj.vnoi.info/raw",
+        "*://*.oj.vnoi.info/raw/*",
+        "*://oj.vnoi.info/*/raw",
+        "*://oj.vnoi.info/*/raw/*",
+        "*://oj.vnoi.info/raw",
+        "*://oj.vnoi.info/raw/*",
+        "*://*.dmoj.ca/*/raw",
+        "*://*.dmoj.ca/*/raw/*",
+        "*://*.dmoj.ca/raw",
+        "*://*.dmoj.ca/raw/*",
+        "*://dmoj.ca/*/raw",
+        "*://dmoj.ca/*/raw/*",
+        "*://dmoj.ca/raw",
+        "*://dmoj.ca/raw/*"
       ],
       "css": [
         "content/content.css"

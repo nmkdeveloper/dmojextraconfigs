@@ -40,7 +40,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Fixed CSP violation error (`sha256-6sOs3tQ9nsCB9fd5ikMQi+0C4uZzCvmPrMZX+EkCmLw=`) by separating `content/mj_shim.js` under `"world": "MAIN"`.
 - Fixed square box constraint (`200 x 200`) on rectangular logos.
-- Completely disabled all extension scripts and CSS injection on `/raw` views (`*://*/*/raw`, `*://*/*/raw/*`, `*://*/raw`, `*://*/raw/*`) via `exclude_matches`, keeping raw plain text code 100% native and removing ad-hoc workarounds.
+- Completely disabled all extension scripts and CSS injection on `/raw` views via domain-specific `exclude_matches` and early JS runtime guards, keeping raw code pages 100% native with zero logs, zero UI, and zero DOM changes.
+- Fixed MathJax runner missing extensions 404 errors (`color.js`, `unicode.js`) by configuring clean offline TeX rendering without dynamic network loader calls.
+- Resolved `MathJax.typesetPromise is not a function` by ensuring `mj_shim.js` reliably stubs `typesetPromise` in `MAIN` world across DMOJ page lifecycles.
 
 ---
 

@@ -33,23 +33,33 @@
     });
   };
 
-  var c = window.MathJax;
-  if (c && typeof c === 'object' && !c.typesetPromise) {
+  var c = window.MathJax || {};
+  if (typeof c === 'object' && !c.typesetPromise) {
     try { c.typesetPromise = stub; } catch (e) {}
   }
 
   try {
     Object.defineProperty(window, 'MathJax', {
       configurable: true,
-      get: function () { return c; },
+      get: function () {
+        if (!c || typeof c !== 'object') c = {};
+        if (!c.typesetPromise) {
+          try { c.typesetPromise = stub; } catch (e) {}
+        }
+        return c;
+      },
       set: function (v) {
-        c = v;
-        if (v && typeof v === 'object' && !v.typesetPromise) {
-          try { v.typesetPromise = stub; } catch (e) {}
+        c = v || {};
+        if (typeof c === 'object' && !c.typesetPromise) {
+          try { c.typesetPromise = stub; } catch (e) {}
         }
       }
     });
-  } catch (e) {}
+  } catch (e) {
+    if (window.MathJax && !window.MathJax.typesetPromise) {
+      try { window.MathJax.typesetPromise = stub; } catch (err) {}
+    }
+  }
 
   var iv = setInterval(function () {
     try {

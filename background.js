@@ -39,17 +39,20 @@ async function syncDynamicContentScripts() {
 
     if (customDomains.length > 0) {
       const matches = customDomains.flatMap(d => [`*://${d}/*`, `*://*.${d}/*`]);
-      const excludeMatches = [
-        "*://*/*/raw",
-        "*://*/*/raw/*",
-        "*://*/raw",
-        "*://*/raw/*"
-      ];
+      const excludeMatches = customDomains.flatMap(d => [
+        `*://${d}/*/raw`,
+        `*://${d}/*/raw/*`,
+        `*://${d}/raw`,
+        `*://${d}/raw/*`,
+        `*://*.${d}/*/raw`,
+        `*://*.${d}/*/raw/*`,
+        `*://*.${d}/raw`,
+        `*://*.${d}/raw/*`
+      ]);
       await chrome.scripting.registerContentScripts([
         {
           id: "dynamic-dmoj-shim",
           matches: matches,
-          excludeMatches: excludeMatches,
           js: ["content/mj_shim.js"],
           runAt: "document_start",
           world: "MAIN"

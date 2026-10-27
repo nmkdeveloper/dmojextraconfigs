@@ -116,6 +116,13 @@ function runTests() {
   assert.strictEqual(classListSet.has('csoj-page-transitioning'), false, 'Reveal must remove csoj-page-transitioning');
   assert.strictEqual(classListSet.has('csoj-page-ready'), true, 'Reveal must add csoj-page-ready');
 
+  // 4. Raw page exclusion tests
+  classListSet.clear();
+  global.location = { origin: 'https://csoj.edu.vn', pathname: '/src/54321/raw', search: '' };
+  PageTransition.initEarly();
+  assert.strictEqual(classListSet.size, 0, 'initEarly on raw page must NOT add any classes');
+  global.location = { origin: 'https://csoj.edu.vn', pathname: '/problems/', search: '' };
+
   console.log('All PageTransition tests PASSED!');
 }
 

@@ -67,6 +67,7 @@ const Dock = {
   _open: false,
 
   build() {
+    if (typeof location !== 'undefined' && /\/raw(\/|$|\?|#)/i.test(location.pathname + location.search)) return;
     if (document.getElementById('csoj-dock')) return;
 
     this.root = document.createElement('div');

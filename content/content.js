@@ -6,6 +6,11 @@
 (function () {
   'use strict';
 
+  // Completely disable all toolkit execution and injection on /raw endpoints
+  if (typeof location !== 'undefined' && /\/raw(\/|$|\?|#)/i.test(location.pathname + location.search)) {
+    return;
+  }
+
   const waitForBody = () => new Promise((resolve) => {
     if (document.body) return resolve();
     const obs = new MutationObserver(() => {

@@ -117,6 +117,7 @@ const PageTransition = {
   },
 
   initEarly() {
+    if (typeof location !== 'undefined' && /\/raw(\/|$|\?|#)/i.test(location.pathname + location.search)) return;
     if (this._isReducedMotion() || typeof document === 'undefined') return;
     // Prepare initial state at document_start to eliminate white flash
     document.documentElement.classList.add('csoj-page-transitioning');
@@ -146,6 +147,7 @@ const PageTransition = {
   },
 
   init() {
+    if (typeof location !== 'undefined' && /\/raw(\/|$|\?|#)/i.test(location.pathname + location.search)) return;
     if (typeof document === 'undefined') return;
     if (this._isReducedMotion()) return;
 
