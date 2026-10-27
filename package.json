@@ -1,0 +1,28 @@
+{
+  "name": "dmojextraconfigs",
+  "version": "7.0.1",
+  "description": "High-performance Chrome Extension (Manifest V3) for DMOJ-based online judging platforms (CSOJ, VNOJ, DMOJ.ca).",
+  "author": "nmkdeveloper <nguyenminhkhoi.nmk.mail@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nmkdeveloper/dmojextraconfigs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nmkdeveloper/dmojextraconfigs/issues"
+  },
+  "homepage": "https://github.com/nmkdeveloper/dmojextraconfigs#readme",
+  "keywords": [
+    "chrome-extension",
+    "manifest-v3",
+    "dmoj",
+    "csoj",
+    "vnoj",
+    "competitive-programming",
+    "toolkit",
+    "view-transitions"
+  ],
+  "scripts": {
+    "test": "node tests/test_storage.js && node tests/test_ac_detection.js && node tests/test_logo_ratio.js && node tests/test_page_transition.js"
+  }
+}
