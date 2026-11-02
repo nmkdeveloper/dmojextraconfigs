@@ -23,6 +23,6 @@
     "view-transitions"
   ],
   "scripts": {
-    "test": "node tests/test_storage.js && node tests/test_ac_detection.js && node tests/test_logo_ratio.js && node tests/test_page_transition.js"
+    "test": "node tests/test_storage.js && node tests/test_ac_detection.js && node tests/test_logo_ratio.js && node tests/test_page_transition.js && node tests/test_submit_modal.js"
   }
 }

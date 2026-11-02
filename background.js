@@ -77,6 +77,7 @@ async function syncDynamicContentScripts() {
             "content/modules/game2048.js",
             "content/modules/export_zip.js",
             "content/modules/ac_easter_egg.js",
+            "content/modules/submit_modal.js",
             "content/content.js"
           ],
           runAt: "document_start"

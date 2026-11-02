@@ -26,11 +26,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Page Container Modern Styling**:
   - Added smooth rounded corners (`border-radius: 16px !important;`) to `#page-container`.
   - Added clean boundary clipping (`overflow: clip;`) and synchronized rounded bottom corners for `footer`.
+- **Submit Modal & Submission Transition (`SubmitModal`)**:
+  - Intercepted "Gửi bài giải" / "Submit solution" links on problem pages, opening a modern modal popup with live Ace code editor and language dropdown instead of navigating away.
+  - Added high-tech glowing orbital pulse submission animation on submit.
+  - Smooth animated transition from the modal directly to the live submission status page (`/submission/<id>`).
 - **Test Suites**:
   - `test_storage.js`: Verified per-site storage key isolation and memory caching.
   - `test_ac_detection.js`: Verified AC Easter Egg parsing against real DMOJ HTML DOM.
   - `test_logo_ratio.js`: Verified ratio calculations and gap elimination styles.
   - `test_page_transition.js`: Verified link eligibility, prefetching, and transition state lifecycles.
+  - `test_submit_modal.js`: Verified submit link matching, modal lifecycle, and submission transitions.
 
 ### Changed
 - **Migrated from Tampermonkey UserScript to Chrome Extension Manifest V3**:

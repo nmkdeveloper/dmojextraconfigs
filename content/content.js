@@ -43,6 +43,7 @@
       await Game2048.init();
       await ExportZIP.init();
       ACEasterEgg.init();
+      SubmitModal.init();
 
       LOG.ok('All NMK Developer DMOJ modules initialized successfully.');
     } catch (err) {

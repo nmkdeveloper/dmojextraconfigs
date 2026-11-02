@@ -86,3 +86,13 @@ This document details all modules included in **NMK Developer DMOJ-based Extra C
   - Top edge glowing progress bar (`#csoj-nav-progress`).
   - Link hover prefetching with 65ms debounce.
   - Instant content entry without waiting for slow asset loads.
+
+---
+
+## 🚀 10. Submit Modal & Submission Transition (`content/modules/submit_modal.js`)
+- **Features**:
+  - **Inline Submit Modal**: Intercepts problem submit links (`/problem/<id>/submit`), opening a sleek glassmorphic modal popup right on the problem page without navigating away.
+  - **Zero-Friction IDE Experience**: Mounts the live DMOJ Ace editor and language select directly into the popup with instant syntax highlighting and resizing.
+  - **Futuristic Submission Effect**: Submits solution via asynchronous POST with a high-tech pulsating orbital ring, glowing progress bar, and transmission feedback.
+  - **Smooth Submission Navigation**: Catches the 302 submission redirect, plays an animated transition, and smoothly glides to the live judging result page (`/submission/<id>`).
+  - **Form Validation & Recovery**: Displays inline error feedback if code is empty or rejected, keeping code 100% safe in the editor.
