@@ -152,6 +152,11 @@ async function runTests() {
     'Should match resubmit submit link'
   );
   assert.strictEqual(
+    SubmitModal._isProblemSubmitLink({ getAttribute: () => '#submit' }),
+    true,
+    'Should match #submit hash link'
+  );
+  assert.strictEqual(
     SubmitModal._isProblemSubmitLink({ getAttribute: () => '/accounts/logout/' }),
     false,
     'Should reject logout'
@@ -292,13 +297,43 @@ async function runTests() {
   assert.strictEqual(document.documentElement.classList.has('csoj-page-exiting'), false, 'close() must clear csoj-page-exiting');
   assert.strictEqual(fakeAceWidget.style.height, undefined, 'Ace widget inline height should be removed on close');
 
-  // 6. CSS verification for overflow-x: hidden and resize handles
+  // 6. CSS verification for overflow-x: hidden, resize handles, and tab submit removal
   const fs = require('fs');
   const path = require('path');
   const css = fs.readFileSync(path.join(__dirname, '../content/content.css'), 'utf8');
   assert.strictEqual(css.includes('overflow-x: hidden !important'), true, 'content.css must include overflow-x: hidden for modal body');
   assert.strictEqual(css.includes('resize: vertical !important'), true, 'content.css must include resize: vertical for Ace widget');
   assert.strictEqual(css.includes('.csoj-editor-resize-handle'), true, 'content.css must include .csoj-editor-resize-handle');
+  assert.strictEqual(css.includes('#submit.tab-content'), true, 'content.css must target #submit.tab-content');
+  assert.strictEqual(/#submit\.tab-content\s*\{[^}]*display:\s*none\s*!important/i.test(css), true, '#submit.tab-content must be display: none !important');
+  assert.strictEqual(/#comments\.tab-content\s*\{[^}]*display:\s*block\s*!important/i.test(css), true, '#comments.tab-content must be display: block !important');
+  assert.strictEqual(css.includes('.problem-tabs'), true, 'content.css must target .problem-tabs');
+
+  // 7. Test _activateCommentsByDefault()
+  const fakeSubmitTab = {
+    id: 'submit',
+    classList: {
+      _classes: new Set(['active']),
+      remove(c) { this._classes.delete(c); },
+      add(c) { this._classes.add(c); },
+      contains(c) { return this._classes.has(c); }
+    }
+  };
+  const fakeCommentsTab = {
+    id: 'comments',
+    classList: {
+      _classes: new Set(),
+      remove(c) { this._classes.delete(c); },
+      add(c) { this._classes.add(c); },
+      contains(c) { return this._classes.has(c); }
+    }
+  };
+  mockElements.set('submit', fakeSubmitTab);
+  mockElements.set('comments', fakeCommentsTab);
+
+  SubmitModal._activateCommentsByDefault();
+  assert.strictEqual(fakeSubmitTab.classList.contains('active'), false, '#submit tab must have active class removed');
+  assert.strictEqual(fakeCommentsTab.classList.contains('active'), true, '#comments tab must have active class added');
 
   console.log('All SubmitModal unit tests PASSED successfully!');
 }

@@ -847,6 +847,24 @@ input[type="range"].csoj-range:disabled::-webkit-slider-thumb {
    Submit Modal & Submission Transition
    ========================================================================== */
 
+/* Problem Page: Hide inline submit tab & show comments by default */
+#submit.tab-content {
+  display: none !important;
+}
+
+#comments.tab-content {
+  display: block !important;
+}
+
+.problem-tabs a[href="#submit"],
+.problem-tabs li:has(a[href="#submit"]) {
+  display: none !important;
+}
+
+.problem-tabs {
+  display: none !important;
+}
+
 body.csoj-modal-open {
   overflow: hidden !important;
 }

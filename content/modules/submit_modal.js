@@ -21,17 +21,49 @@ const SubmitModal = {
   init() {
     this._bindLinkInterception();
     this._bindStandaloneForm();
+    this._activateCommentsByDefault();
+    this._checkHashSubmit();
   },
 
   _isProblemSubmitLink(a) {
     if (!a || !a.getAttribute) return false;
     const href = a.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return false;
+    if (!href || href.startsWith('javascript:')) return false;
 
-    // Check if it's a submit link for a problem
-    // Matches /problem/<id>/submit, /contest/<cid>/problem/<pid>/submit, etc.
+    // Matches /problem/<id>/submit, /contest/<cid>/problem/<pid>/submit, #submit, etc.
     return /\/problem\/[^\/]+\/(?:resubmit\/\d+\/)?submit(?:\/|\?|#|$)/i.test(href) ||
-           (href.endsWith('/submit') || href.endsWith('/submit/'));
+           (href.endsWith('/submit') || href.endsWith('/submit/')) ||
+           href === '#submit';
+  },
+
+  _activateCommentsByDefault() {
+    const switchTabs = () => {
+      const submitTab = document.getElementById('submit');
+      const commentsTab = document.getElementById('comments');
+      const submitTabLink = document.querySelector('.problem-tabs a[href="#submit"]');
+      const commentsTabLink = document.querySelector('.problem-tabs a[href="#comments"]');
+
+      if (submitTab && submitTab.classList) submitTab.classList.remove('active');
+      if (commentsTab && commentsTab.classList) commentsTab.classList.add('active');
+      if (submitTabLink && submitTabLink.classList) submitTabLink.classList.remove('active');
+      if (commentsTabLink && commentsTabLink.classList) commentsTabLink.classList.add('active');
+    };
+
+    if (typeof document !== 'undefined') {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', switchTabs, { once: true });
+      } else {
+        switchTabs();
+      }
+    }
+  },
+
+  _checkHashSubmit() {
+    if (typeof location !== 'undefined' && location.hash === '#submit') {
+      setTimeout(() => {
+        this.open();
+      }, 250);
+    }
   },
 
   _bindLinkInterception() {
