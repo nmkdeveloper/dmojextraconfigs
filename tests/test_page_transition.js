@@ -91,6 +91,24 @@ function runTests() {
   };
   assert.strictEqual(PageTransition._isEligibleLink(rawLink), false, 'Raw link should not be intercepted');
 
+  const submitLink = {
+    getAttribute(name) { return name === 'href' ? '/problem/vienthong/submit' : null; },
+    hasAttribute() { return false; }
+  };
+  assert.strictEqual(PageTransition._isEligibleLink(submitLink), false, 'Submit link should not be intercepted by PageTransition');
+
+  const contestSubmitLink = {
+    getAttribute(name) { return name === 'href' ? '/contest/vnoi2026/problem/vienthong/submit/' : null; },
+    hasAttribute() { return false; }
+  };
+  assert.strictEqual(PageTransition._isEligibleLink(contestSubmitLink), false, 'Contest submit link should not be intercepted');
+
+  const noTransitionLink = {
+    getAttribute(name) { return name === 'href' ? '/submissions/' : null; },
+    hasAttribute(name) { return name === 'data-csoj-no-transition'; }
+  };
+  assert.strictEqual(PageTransition._isEligibleLink(noTransitionLink), false, 'Link with data-csoj-no-transition should not be eligible');
+
   const ctrlClick = { ctrlKey: true };
   assert.strictEqual(PageTransition._isEligibleLink(internalLink, ctrlClick), false, 'Ctrl+click should not trigger transition');
 
@@ -116,14 +134,21 @@ function runTests() {
   assert.strictEqual(classListSet.has('csoj-page-transitioning'), false, 'Reveal must remove csoj-page-transitioning');
   assert.strictEqual(classListSet.has('csoj-page-ready'), true, 'Reveal must add csoj-page-ready');
 
-  // 4. Raw page exclusion tests
+  // 4. cancelExit tests
+  classListSet.clear();
+  classListSet.add('csoj-page-exiting');
+  PageTransition.cancelExit();
+  assert.strictEqual(classListSet.has('csoj-page-exiting'), false, 'cancelExit must remove csoj-page-exiting');
+  assert.strictEqual(classListSet.has('csoj-transition-settled'), true, 'cancelExit must add csoj-transition-settled');
+
+  // 5. Raw page exclusion tests
   classListSet.clear();
   global.location = { origin: 'https://csoj.edu.vn', pathname: '/src/54321/raw', search: '' };
   PageTransition.initEarly();
   assert.strictEqual(classListSet.size, 0, 'initEarly on raw page must NOT add any classes');
   global.location = { origin: 'https://csoj.edu.vn', pathname: '/problems/', search: '' };
 
-  // 5. Page container rounded styling verification
+  // 6. Page container rounded styling verification
   const fs = require('fs');
   const path = require('path');
   const css = fs.readFileSync(path.join(__dirname, '../content/content.css'), 'utf8');

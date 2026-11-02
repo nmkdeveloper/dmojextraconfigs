@@ -947,9 +947,15 @@ body.csoj-modal-open {
 
 #csoj-submit-modal-body {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
   padding: 18px 22px;
   position: relative;
+  box-sizing: border-box !important;
+}
+
+#csoj-submit-modal-body * {
+  box-sizing: border-box !important;
 }
 
 /* Reset DMOJ form inside modal */
@@ -959,13 +965,133 @@ body.csoj-modal-open {
   padding: 0 !important;
   margin: 0 !important;
   width: 100% !important;
+  max-width: 100% !important;
   box-sizing: border-box !important;
 }
 
+#csoj-submit-modal-body .select2,
+#csoj-submit-modal-body .select2-container,
+#csoj-submit-modal-body .select2-container--dmoj,
+#csoj-submit-modal-body .select2-container--default {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+#csoj-submit-modal-body .select2-selection,
+#csoj-submit-modal-body .select2-selection--single {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#csoj-submit-modal-body .django-ace-editor {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  margin-bottom: 2px !important;
+}
+
+#csoj-submit-modal-body .django-ace-toolbar {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-bottom: none !important;
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+  padding: 4px 10px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+}
+
 #csoj-submit-modal-body .django-ace-widget {
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-height: 260px !important;
+  height: 440px !important;
+  max-height: 72vh !important;
+  resize: vertical !important;
+  overflow: hidden !important;
+  border-bottom-left-radius: 10px !important;
+  border-bottom-right-radius: 10px !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-sizing: border-box !important;
+}
+
+#csoj-submit-modal-body .django-ace-widget > div:first-child,
+#csoj-submit-modal-body #ace_source > div:first-child {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+#csoj-submit-modal-body .ace_editor {
+  width: 100% !important;
+  height: 100% !important;
+  box-sizing: border-box !important;
+}
+
+#csoj-submit-modal-body .ace_scroller {
+  box-sizing: border-box !important;
+}
+
+#csoj-submit-modal-body .ace_scrollbar-v {
+  z-index: 6 !important;
+}
+
+/* Custom drag resize handle below code editor */
+.csoj-editor-resize-handle {
+  height: 14px;
+  width: 100%;
+  margin: 4px 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: ns-resize;
+  user-select: none;
+  -webkit-user-select: none;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+
+.csoj-editor-resize-handle:hover,
+.csoj-editor-resize-handle.active {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+.csoj-resize-grip {
+  width: 48px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.25);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.csoj-editor-resize-handle:hover .csoj-resize-grip,
+.csoj-editor-resize-handle.active .csoj-resize-grip {
+  background: #818cf8;
+  width: 72px;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.7);
+}
+
+/* Ensure fullscreen mode stays above modal */
+.django-ace-editor-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 100050 !important;
 }
 
 #csoj-submit-modal-body .submit-bar {

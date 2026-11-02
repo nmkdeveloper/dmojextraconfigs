@@ -16,6 +16,7 @@ const SubmitModal = {
   _submitUrl: null,
   _isOpen: false,
   _isSubmitting: false,
+  _aceResizeObserver: null,
 
   init() {
     this._bindLinkInterception();
@@ -49,6 +50,14 @@ const SubmitModal = {
       if (this._isProblemSubmitLink(a)) {
         e.preventDefault();
         e.stopPropagation();
+        if (typeof PageTransition !== 'undefined' && PageTransition.cancelExit) {
+          PageTransition.cancelExit();
+        } else if (typeof window !== 'undefined' && window.PageTransition && window.PageTransition.cancelExit) {
+          window.PageTransition.cancelExit();
+        } else if (typeof document !== 'undefined') {
+          document.documentElement.classList.remove('csoj-page-exiting', 'csoj-page-transitioning');
+          document.documentElement.classList.add('csoj-transition-settled');
+        }
         this.open(a.href);
       }
     }, { capture: true });
@@ -144,6 +153,16 @@ const SubmitModal = {
     this._isOpen = true;
     this._isSubmitting = false;
 
+    // Ensure background page never stays in dimmed/exiting state
+    if (typeof PageTransition !== 'undefined' && PageTransition.cancelExit) {
+      PageTransition.cancelExit();
+    } else if (typeof window !== 'undefined' && window.PageTransition && window.PageTransition.cancelExit) {
+      window.PageTransition.cancelExit();
+    } else if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('csoj-page-exiting', 'csoj-page-transitioning');
+      document.documentElement.classList.add('csoj-transition-settled');
+    }
+
     // Reset status & animation
     this._statusEl.textContent = '';
     this._statusEl.className = '';
@@ -164,21 +183,141 @@ const SubmitModal = {
       }
       this._body.appendChild(form);
 
-      // Adjust ace editor height for modal
-      const aceWidget = form.querySelector('.django-ace-widget');
-      if (aceWidget) {
-        aceWidget.style.height = '420px';
+      // Force select2 to 100% width so it never breaks modal boundary
+      if (typeof form.querySelectorAll === 'function') {
+        form.querySelectorAll('.select2, .select2-container').forEach(el => {
+          if (el && el.style) {
+            if (typeof el.style.setProperty === 'function') {
+              el.style.setProperty('width', '100%', 'important');
+              el.style.setProperty('max-width', '100%', 'important');
+            } else {
+              el.style.width = '100%';
+              el.style.maxWidth = '100%';
+            }
+          }
+        });
       }
 
-      // Re-trigger ace editor resize so it redraws immediately
-      if (window.ace_source && typeof window.ace_source.resize === 'function') {
-        setTimeout(() => {
-          try {
-            window.ace_source.resize();
-            window.ace_source.focus();
-          } catch {}
-        }, 80);
+      // Configure Ace editor widget and attach vertical resize drag handle
+      const aceWidget = form.querySelector('.django-ace-widget');
+      if (aceWidget) {
+        if (aceWidget.style) {
+          if (typeof aceWidget.style.setProperty === 'function') {
+            aceWidget.style.setProperty('height', '440px', 'important');
+          } else {
+            aceWidget.style.height = '440px';
+          }
+        }
+
+        // Add visible draggable resize handle
+        let resizeHandle = this._body.querySelector('.csoj-editor-resize-handle');
+        if (!resizeHandle && typeof document.createElement === 'function') {
+          resizeHandle = document.createElement('div');
+          resizeHandle.className = 'csoj-editor-resize-handle';
+          resizeHandle.title = 'Kéo để thay đổi chiều cao khung code';
+          resizeHandle.innerHTML = '<div class="csoj-resize-grip"></div>';
+
+          const editorContainer = (typeof aceWidget.closest === 'function' ? aceWidget.closest('.django-ace-editor') : null) || aceWidget;
+          if (editorContainer.parentNode) {
+            if (editorContainer.nextSibling) {
+              editorContainer.parentNode.insertBefore(resizeHandle, editorContainer.nextSibling);
+            } else if (typeof editorContainer.parentNode.appendChild === 'function') {
+              editorContainer.parentNode.appendChild(resizeHandle);
+            }
+          }
+
+          // Drag logic for vertical resize
+          let isDragging = false;
+          let startY = 0;
+          let startH = 0;
+
+          const onPointerMove = (moveEvt) => {
+            if (!isDragging) return;
+            const dy = moveEvt.clientY - startY;
+            const minH = 260;
+            const maxH = Math.max(minH, (window.innerHeight || 800) * 0.72);
+            const targetH = Math.max(minH, Math.min(maxH, startH + dy));
+            if (aceWidget.style) {
+              if (typeof aceWidget.style.setProperty === 'function') {
+                aceWidget.style.setProperty('height', `${targetH}px`, 'important');
+              } else {
+                aceWidget.style.height = `${targetH}px`;
+              }
+            }
+            if (window.ace_source && typeof window.ace_source.resize === 'function') {
+              window.ace_source.resize(true);
+            }
+          };
+
+          const onPointerUp = () => {
+            if (!isDragging) return;
+            isDragging = false;
+            resizeHandle.classList.remove('active');
+            window.removeEventListener('pointermove', onPointerMove);
+            window.removeEventListener('pointerup', onPointerUp);
+            if (window.ace_source && typeof window.ace_source.resize === 'function') {
+              window.ace_source.resize(true);
+            }
+          };
+
+          resizeHandle.onpointerdown = (downEvt) => {
+            downEvt.preventDefault();
+            isDragging = true;
+            startY = downEvt.clientY;
+            startH = aceWidget.offsetHeight || 440;
+            resizeHandle.classList.add('active');
+            window.addEventListener('pointermove', onPointerMove);
+            window.addEventListener('pointerup', onPointerUp);
+          };
+        }
+
+        // Attach ResizeObserver to keep Ace editor synced on any container resize
+        if (typeof ResizeObserver !== 'undefined') {
+          if (this._aceResizeObserver) {
+            this._aceResizeObserver.disconnect();
+          }
+          this._aceResizeObserver = new ResizeObserver(() => {
+            if (window.ace_source && typeof window.ace_source.resize === 'function') {
+              window.ace_source.resize(true);
+            }
+          });
+          this._aceResizeObserver.observe(aceWidget);
+        }
       }
+
+      // Re-trigger and configure ace editor so all lines are visible and scrollable
+      const syncAce = () => {
+        if (window.ace_source) {
+          const editor = window.ace_source;
+          try {
+            if (typeof editor.setAutoScrollEditorIntoView === 'function') {
+              editor.setAutoScrollEditorIntoView(false);
+            }
+            if (typeof editor.setOption === 'function') {
+              editor.setOption('scrollPastEnd', 0.5);
+              editor.setOption('maxLines', null);
+              editor.setOption('minLines', null);
+            }
+            if (editor.renderer && typeof editor.renderer.setScrollMargin === 'function') {
+              editor.renderer.setScrollMargin(8, 8, 8, 8);
+            }
+            if (typeof editor.resize === 'function') {
+              editor.resize(true);
+            }
+            if (editor.renderer && typeof editor.renderer.updateFull === 'function') {
+              editor.renderer.updateFull(true);
+            }
+          } catch {}
+        }
+      };
+
+      syncAce();
+      setTimeout(syncAce, 60);
+      setTimeout(syncAce, 160);
+      setTimeout(() => {
+        syncAce();
+        try { window.ace_source?.focus(); } catch {}
+      }, 320);
     } else {
       // Form not in current page DOM — fetch from submitUrl
       this._body.innerHTML = `
@@ -241,19 +380,51 @@ const SubmitModal = {
     this._overlay.classList.remove('open');
     document.body.classList.remove('csoj-modal-open');
 
+    // Clean up ResizeObserver
+    if (this._aceResizeObserver) {
+      this._aceResizeObserver.disconnect();
+      this._aceResizeObserver = null;
+    }
+
+    // Clean up drag handle
+    const handle = this._overlay?.querySelector?.('.csoj-editor-resize-handle') ||
+                   this._currentForm?.querySelector?.('.csoj-editor-resize-handle');
+    if (handle && typeof handle.remove === 'function') {
+      handle.remove();
+    }
+
     // Restore form to its original place in the page DOM
     if (this._currentForm && this._placeholder && this._placeholder.parentNode) {
       const aceWidget = this._currentForm.querySelector('.django-ace-widget');
-      if (aceWidget) {
-        aceWidget.style.height = '';
+      if (aceWidget && aceWidget.style) {
+        if (typeof aceWidget.style.removeProperty === 'function') {
+          aceWidget.style.removeProperty('height');
+        } else {
+          aceWidget.style.height = '';
+        }
       }
       this._placeholder.parentNode.insertBefore(this._currentForm, this._placeholder);
       this._placeholder.remove();
       this._placeholder = null;
 
       if (window.ace_source && typeof window.ace_source.resize === 'function') {
-        try { window.ace_source.resize(); } catch {}
+        try {
+          window.ace_source.resize(true);
+          if (window.ace_source.renderer && typeof window.ace_source.renderer.updateFull === 'function') {
+            window.ace_source.renderer.updateFull(true);
+          }
+        } catch {}
       }
+    }
+
+    // Ensure background page is fully restored and interactive
+    if (typeof PageTransition !== 'undefined' && PageTransition.cancelExit) {
+      PageTransition.cancelExit();
+    } else if (typeof window !== 'undefined' && window.PageTransition && window.PageTransition.cancelExit) {
+      window.PageTransition.cancelExit();
+    } else if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('csoj-page-exiting', 'csoj-page-transitioning');
+      document.documentElement.classList.add('csoj-transition-settled');
     }
 
     this._currentForm = null;

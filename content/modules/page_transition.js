@@ -45,10 +45,13 @@ const PageTransition = {
     // Same pathname and search: if only hash differs, skip
     if (targetUrl.pathname === location.pathname && targetUrl.search === location.search) return false;
 
-    // Exclude logout, raw code views, or download extensions
+    // Exclude logout, raw code views, submit forms/modals, or download extensions
     const path = targetUrl.pathname.toLowerCase();
-    if (/\/logout(\/|$)/i.test(path) || /\/raw(\/|$)/i.test(path)) return false;
+    if (/\/logout(\/|$)/i.test(path) || /\/raw(\/|$)/i.test(path) || /\/submit(\/|$)/i.test(path)) return false;
     if (/\.(zip|tar|gz|7z|pdf|png|jpe?g|gif|webp|svg|exe|msi)$/i.test(path)) return false;
+
+    // Exclude explicit no-transition links or modal triggers
+    if (anchor.hasAttribute('data-csoj-no-transition') || anchor.closest?.('[data-csoj-no-transition]')) return false;
 
     return true;
   },
@@ -114,6 +117,22 @@ const PageTransition = {
         bar.style.width = '0%';
       }, 200);
     }, 180);
+  },
+
+  cancelExit() {
+    clearTimeout(this._exitTimeout);
+    clearTimeout(this._progressTimer);
+    clearTimeout(this._hoverTimer);
+
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.remove('csoj-page-exiting', 'csoj-page-transitioning');
+      document.documentElement.classList.add('csoj-transition-settled');
+    }
+
+    if (this._progressBar) {
+      this._progressBar.classList.remove('active');
+      this._progressBar.style.width = '0%';
+    }
   },
 
   initEarly() {

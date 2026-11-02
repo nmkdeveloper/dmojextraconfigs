@@ -92,6 +92,19 @@ global.document = {
           };
         }
         if (sel === 'textarea#id_source') return { value: '#include <iostream>' };
+        if (sel.startsWith('.')) {
+          const cls = sel.slice(1);
+          const findChild = (node) => {
+            if (node.classList && node.classList.contains && node.classList.contains(cls)) return node;
+            if (node.className && node.className.includes(cls)) return node;
+            for (const child of node.children || []) {
+              const res = findChild(child);
+              if (res) return res;
+            }
+            return null;
+          };
+          return findChild(this);
+        }
         return null;
       },
       addEventListener() {}
@@ -159,6 +172,39 @@ async function runTests() {
   assert.strictEqual(SubmitModal._modal !== null, true, 'Modal window must be built');
 
   // 4. Open with existing form in page
+  const fakeAceWidget = {
+    className: 'django-ace-widget',
+    style: {
+      setProperty(k, v) { this[k] = v; },
+      removeProperty(k) { delete this[k]; }
+    },
+    parentNode: null,
+    offsetHeight: 440,
+    closest(sel) { return sel === '.django-ace-editor' ? this.parentNode : null; }
+  };
+  const fakeEditorContainer = {
+    className: 'django-ace-editor',
+    children: [fakeAceWidget],
+    parentNode: null,
+    insertBefore(newNode, refNode) {
+      this.children.push(newNode);
+      newNode.parentNode = this;
+    },
+    appendChild(newNode) {
+      this.children.push(newNode);
+      newNode.parentNode = this;
+    }
+  };
+  fakeAceWidget.parentNode = fakeEditorContainer;
+
+  const fakeSelect2 = {
+    className: 'select2 select2-container',
+    style: {
+      setProperty(k, v) { this[k] = v; },
+      removeProperty(k) { delete this[k]; }
+    }
+  };
+
   const fakeParent = {
     children: [],
     insertBefore(newNode, refNode) {
@@ -168,30 +214,91 @@ async function runTests() {
       newNode.parentNode = this;
     }
   };
+
   const fakeForm = {
     id: 'problem_submit',
     parentNode: fakeParent,
     dataset: {},
-    children: [],
+    children: [fakeEditorContainer, fakeSelect2],
+    appendChild(newNode) {
+      this.children.push(newNode);
+      newNode.parentNode = this;
+      return newNode;
+    },
+    insertBefore(newNode, refNode) {
+      const idx = this.children.indexOf(refNode);
+      if (idx >= 0) this.children.splice(idx, 0, newNode);
+      else this.children.push(newNode);
+      newNode.parentNode = this;
+    },
     querySelector: (sel) => {
-      if (sel === '.django-ace-widget') return { style: {} };
+      if (sel === '.django-ace-widget') return fakeAceWidget;
       if (sel === '#id_language') return { selectedIndex: 0, options: [{ getAttribute: () => 'False' }] };
       if (sel === 'textarea#id_source') return { value: 'int main() {}' };
+      if (sel.startsWith('.')) {
+        const cls = sel.slice(1);
+        const findChild = (node) => {
+          if (node.classList && node.classList.contains && node.classList.contains(cls)) return node;
+          if (node.className && node.className.includes(cls)) return node;
+          for (const child of node.children || []) {
+            const res = findChild(child);
+            if (res) return res;
+          }
+          return null;
+        };
+        return findChild(fakeForm);
+      }
       return null;
+    },
+    querySelectorAll: (sel) => {
+      if (sel.includes('.select2')) return [fakeSelect2];
+      return [];
     },
     addEventListener() {}
   };
+  fakeEditorContainer.parentNode = fakeForm;
   fakeParent.children.push(fakeForm);
   mockElements.set('problem_submit', fakeForm);
+
+  // Set csoj-page-exiting to test if open() clears it
+  document.documentElement.classList.add('csoj-page-exiting');
 
   await SubmitModal.open('/problem/b_chanle/submit');
   assert.strictEqual(SubmitModal._isOpen, true, 'Modal should be marked open');
   assert.strictEqual(document.body.classList.has('csoj-modal-open'), true, 'Body should have csoj-modal-open');
+  assert.strictEqual(document.documentElement.classList.has('csoj-page-exiting'), false, 'open() must clear csoj-page-exiting');
+  assert.strictEqual(fakeAceWidget.style.height, '440px', 'Ace widget height should be set to 440px');
+  assert.strictEqual(fakeSelect2.style.width, '100%', 'Select2 container width must be set to 100%');
 
-  // 5. Close modal restores placeholder
+  // Verify drag handle exists
+  const handle = SubmitModal._overlay.querySelector('.csoj-editor-resize-handle') ||
+                 fakeEditorContainer.children.find(c => c.className === 'csoj-editor-resize-handle');
+  assert.strictEqual(!!handle, true, 'Resize handle should be created');
+
+  // Test dragging handle downwards
+  if (handle && handle.onpointerdown) {
+    handle.onpointerdown({ preventDefault() {}, clientY: 100 });
+    // Trigger move event added to window
+    // (pointer down recorded startH = 440, startY = 100)
+  }
+
+  // Set csoj-page-exiting again to test close()
+  document.documentElement.classList.add('csoj-page-exiting');
+
+  // 5. Close modal restores placeholder and cleans up
   SubmitModal.close();
   assert.strictEqual(SubmitModal._isOpen, false, 'Modal should be closed');
   assert.strictEqual(document.body.classList.has('csoj-modal-open'), false, 'Body class should be removed');
+  assert.strictEqual(document.documentElement.classList.has('csoj-page-exiting'), false, 'close() must clear csoj-page-exiting');
+  assert.strictEqual(fakeAceWidget.style.height, undefined, 'Ace widget inline height should be removed on close');
+
+  // 6. CSS verification for overflow-x: hidden and resize handles
+  const fs = require('fs');
+  const path = require('path');
+  const css = fs.readFileSync(path.join(__dirname, '../content/content.css'), 'utf8');
+  assert.strictEqual(css.includes('overflow-x: hidden !important'), true, 'content.css must include overflow-x: hidden for modal body');
+  assert.strictEqual(css.includes('resize: vertical !important'), true, 'content.css must include resize: vertical for Ace widget');
+  assert.strictEqual(css.includes('.csoj-editor-resize-handle'), true, 'content.css must include .csoj-editor-resize-handle');
 
   console.log('All SubmitModal unit tests PASSED successfully!');
 }
