@@ -23,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Completely eliminated empty letterboxing gaps on top and bottom by setting `height: auto` in locked manual mode and `width: auto` in navbar auto-fit mode.
   - Two-way synchronized Width & Height sliders preserving original aspect ratio.
   - Smart Divider auto-height matching rendered logo height without gap.
+- **Page Container Modern Styling**:
+  - Added smooth rounded corners (`border-radius: 16px !important;`) to `#page-container`.
+  - Added clean boundary clipping (`overflow: clip;`) and synchronized rounded bottom corners for `footer`.
 - **Test Suites**:
   - `test_storage.js`: Verified per-site storage key isolation and memory caching.
   - `test_ac_detection.js`: Verified AC Easter Egg parsing against real DMOJ HTML DOM.

@@ -123,6 +123,14 @@ function runTests() {
   assert.strictEqual(classListSet.size, 0, 'initEarly on raw page must NOT add any classes');
   global.location = { origin: 'https://csoj.edu.vn', pathname: '/problems/', search: '' };
 
+  // 5. Page container rounded styling verification
+  const fs = require('fs');
+  const path = require('path');
+  const css = fs.readFileSync(path.join(__dirname, '../content/content.css'), 'utf8');
+  assert.strictEqual(css.includes('#page-container'), true, 'content.css must include #page-container');
+  assert.strictEqual(/#page-container\s*\{[^}]*border-radius:\s*16px/i.test(css), true, '#page-container must have border-radius: 16px');
+  assert.strictEqual(/#page-container\s*>\s*footer/i.test(css), true, 'footer inside #page-container must have matching border-radius');
+
   console.log('All PageTransition tests PASSED!');
 }
 

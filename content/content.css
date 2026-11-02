@@ -128,6 +128,18 @@ html.csoj-logo-has-override img[src*="/logo"][src$=".svg"]:not([data-csoj-logo])
   visibility: hidden !important;
 }
 
+/* Page Container Rounded Styling */
+#page-container {
+  border-radius: 16px !important;
+  overflow: clip;
+}
+
+#page-container > footer,
+footer {
+  border-bottom-left-radius: 16px !important;
+  border-bottom-right-radius: 16px !important;
+}
+
 /* Floating Dock */
 #csoj-dock {
   position: fixed;
